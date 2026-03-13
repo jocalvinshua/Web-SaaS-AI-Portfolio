@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import "tailwindcss";
+
+:root {
+  --color-primary: #004E64;
+  --color-primary-light: #0094bd;
+  --color-secondary: #25A18E;
+  --color-accent: #F4A261; 
+  --color-bg-light: #E2F9FF;    
+  --color-surface: #FFFFFF;     
+  --color-text-main: #002D3A;
+  --color-text-muted: #547B86;
+}
+
+@layer components {
+  .text-main {
+    color: var(--color-text-main);
+  }
+  .text-accent{
+    color: var(--color-accent)
+  }
+  .text-secondary{
+    color: var(--color-secondary);
+  }
+  .text-muted {
+    color: var(--color-text-muted);
+  }
+
+  .bg-primary {
+    background-color: var(--color-primary);
+  }
+  .bg-primary-light{
+    background-color: var(--color-primary-light);
+  }
+  .bg-secondary{
+    background-color: var(--color-secondary);
+  }
+  
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-surface);
+    transition: all 0.3s ease;
+    color: var(--color-bg-light);
+  }
+
+
+  .btn-primary:hover {
+    background-color: var(--color-primary-light);
+  }
+}
