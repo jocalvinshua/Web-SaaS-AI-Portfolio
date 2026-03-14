@@ -25,6 +25,9 @@
   .text-muted {
     color: var(--color-text-muted);
   }
+  .border-primary{
+    color: var(--color-primary)
+  }
 
   .bg-primary {
     background-color: var(--color-primary);
