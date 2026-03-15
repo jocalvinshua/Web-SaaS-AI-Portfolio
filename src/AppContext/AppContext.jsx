@@ -1,14 +1,16 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useContext } from "react";
 
-export const AppContext = createContext();
+const AppContext = createContext();
 
-export const AppContextProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // Gunakan null jika belum ada user
-  const [isLogin, setIsLogin] = useState(false);
+export const AppProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [isLogin, setIsLogin] = useState(true);
 
   const value = {
-    // Hook
-    user, setUser, isLogin, setIsLogin
+    user,
+    setUser,
+    isLogin,
+    setIsLogin,
   };
 
   return (
@@ -16,4 +18,12 @@ export const AppContextProvider = ({ children }) => {
       {children}
     </AppContext.Provider>
   );
+};
+
+export const useAppContext = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error("useAppContext must be used within an AppProvider");
+  }
+  return context;
 };
