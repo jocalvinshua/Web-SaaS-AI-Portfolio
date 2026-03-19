@@ -15,7 +15,7 @@ export default function Layout() {
                 <div className="flex items-center gap-5">
                     <p className="text-gray-600 text-sm hidden sm:block">Hi, Admin!</p>
                     <button 
-                        onClick={() => alert("Logout Successfully")} 
+                        onClick={() => logout()} 
                         className='border border-gray-300 rounded-full text-sm px-5 py-1.5 hover:bg-gray-50 transition-all'
                     >
                         Logout
@@ -24,7 +24,6 @@ export default function Layout() {
             </header>
 
             <div className="flex flex-1 h-[calc(100vh-60px)]"> 
-                <Sidebar />
                 <main className="flex-1 bg-gray-50 p-8 overflow-y-auto">
                     <Outlet />
                 </main>

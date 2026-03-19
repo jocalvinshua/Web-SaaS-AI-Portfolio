@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import { useAppContext } from "./AppContext/AppContext";
 import Layout from "./components/Layout";
 import Template from "./pages/Template";
+import MyResume from "./pages/MyResume";
 import Resume from "./pages/Resume";
 
 export default function App() {
@@ -17,7 +18,8 @@ export default function App() {
       <Route path="/dashboard" element={isLogin ? <Layout /> : <Navigate to="/login" />} >
         <Route index element={<Dashboard />} /> 
         <Route path="template" element={<Template />} /> 
-        <Route path="resume" element={<Resume />} /> 
+        <Route path="MyResume" element={<MyResume />} /> 
+        <Route path="resume/:userId" element={<Resume />} />
       </Route>
 
       <Route 

@@ -1,14 +1,22 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+
+import OurResume from "../components/OurResume"
 
 export default function Dashboard() {
     const [isOpen, setIsOpen] = useState(false)
     const [title, setTitle] = useState("")
+    const navigate = useNavigate()
+
+    // Dummy random id
+    const id = Math.random()
 
     const handleSubmit = (e) => {
         e.preventDefault()
         
         if (title.trim()) {
-            alert(`Resume Title Created: ${title}`)
+            // alert(`Resume Title Created: ${title}`)
+            navigate(`/dashboard/resume/${id}`);
             setIsOpen(false)
             setTitle("")
         } else {
@@ -40,6 +48,9 @@ export default function Dashboard() {
                     <span className="font-semibold text-gray-600">Upload Resume</span>
                 </div>
             </div>
+
+            {/* User resume */}
+            <OurResume />
 
             {/* Modal Overlay */}
             {isOpen && (
