@@ -3,7 +3,7 @@ import Sidebar from "./Sidebar";
 import { useAppContext } from "../AppContext/AppContext";
 
 export default function Layout() {
-    const { logout } = useAppContext(); // Gunakan fungsi logout dari context
+    const { logout, user } = useAppContext(); // Gunakan fungsi logout dari context
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -13,7 +13,7 @@ export default function Layout() {
                     <span className="text-xl font-bold text-primary">PortfoliUI</span>
                 </Link>
                 <div className="flex items-center gap-5">
-                    <p className="text-gray-600 text-sm hidden sm:block">Hi, Admin!</p>
+                    <p className="text-gray-600 text-sm hidden sm:block">Hi, {user}!</p>
                     <button 
                         onClick={() => logout()} 
                         className='border border-gray-300 rounded-full text-sm px-5 py-1.5 hover:bg-gray-50 transition-all'

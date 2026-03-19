@@ -1,8 +1,19 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '../AppContext/AppContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate()
+  const {isLogin} = useAppContext()
 
+  const handleLogin = ()=>{
+    if(isLogin){
+      navigate('/dashboard')
+    }else{
+      navigate('/login')
+    }
+  }
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -34,8 +45,10 @@ const Navbar = () => {
         </ul>
         
         {/* Button (Desktop) */}
-        <button className="hidden md:inline-block btn-primary px-9 py-2 rounded-full active:scale-95 transition-all font-medium border-none">
-          Get started
+        <button 
+          onClick={handleLogin}
+          className="hidden md:inline-block btn-primary px-9 py-2 rounded-full active:scale-95 transition-all font-medium border-none">
+          {isLogin ? "Go To Dashboard" : "Get Started"}
         </button>
 
         {/* Menu Toggle (Mobile) */}
@@ -61,9 +74,10 @@ const Navbar = () => {
 
           <button 
             type="button" 
+            onClick={handleLogin}
             className="bg-primary text-white mt-6 text-sm hover:opacity-90 active:scale-95 transition-all w-full h-11 rounded-full font-medium"
           >
-            Get started
+            {isLogin ? "Go To Dashboard" : "Get Started"}
           </button>
         </div>
       </nav>
