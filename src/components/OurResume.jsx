@@ -41,9 +41,6 @@ function CurrentResume() {
             <h1 className="text-3xl font-bold text-gray-900">Your Resumes</h1>
             <p className="text-gray-500 mt-1">Manage and edit your professional documents.</p>
           </div>
-          <button className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 active:scale-95">
-            + Create New
-          </button>
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

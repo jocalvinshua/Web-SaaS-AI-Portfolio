@@ -4,29 +4,30 @@ import { useNavigate } from "react-router-dom";
 const AppContext = createContext();
 
 const initialState = {
-    user: null,
-    isLogin: false,
-    isLoading: false,
-  }
+  user: null,
+  isLogin: false,
+  isLoading: false,
+  error: null, 
+}
 
-  const authReducer = ()=>{
-    switch (action.type){
-      case "LOGIN_START":
-        return { ...state, isLoading: true, error: null };
+const authReducer = (state, action) => {
+  switch (action.type) {
+    case "LOGIN_START":
+      return { ...state, isLoading: true, error: null };
     case "LOGIN_SUCCESS":
-      return { 
-        ...state, 
-        isLoading: false, 
-        isLogin: true, 
+      return {
+        ...state,
+        isLoading: false,
+        isLogin: true,
         user: action.payload,
-        error: null 
+        error: null,
       };
     case "LOGIN_FAILURE":
-      return { 
-        ...state, 
-        isLoading: false, 
-        isLogin: false, 
-        error: action.payload 
+      return {
+        ...state,
+        isLoading: false,
+        isLogin: false,
+        error: action.payload,
       };
     case "LOGOUT":
       return { ...initialState };
@@ -52,10 +53,10 @@ export const AppProvider = ({ children }) => {
   );
 };
 
-export const useAppContext = () => {
-  const context = useContext(AppContext);
+export const useAppContext = ()=>{
+  const context = useContext(AppContext)
   if (!context) {
     throw new Error("useAppContext must be used within an AppProvider");
   }
   return context;
-};
+}

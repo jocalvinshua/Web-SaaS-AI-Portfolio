@@ -21,23 +21,27 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        dispatch({ type: "LOGIN_START" });
 
+        dispatch({ type: "LOGIN_START" });
         try {
             await new Promise(resolve => setTimeout(resolve, 1500));
-
-            const userData = { 
-                name: formData.name || 'User', 
-                email: formData.email 
+            const userData = {
+                name: formData.name || "User",
+                email: formData.email,
             };
+            console.log(userData)
+            dispatch({
+                type: "LOGIN_SUCCESS",
+                payload: userData
+            });
 
-            localStorage.setItem("user", JSON.stringify(userData));
-            dispatch({ type: "LOGIN_SUCCESS", payload: userData });
-            
             navigate("/dashboard");
+
         } catch (err) {
-            dispatch({ type: "LOGIN_FAILURE", payload: "Login failed. Please try again." });
+            dispatch({
+                type: "LOGIN_FAILURE",
+                payload: "Login failed. Please try again."
+            });
         }
     };
 
