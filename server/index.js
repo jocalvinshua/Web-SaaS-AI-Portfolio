@@ -4,6 +4,7 @@ import connectDB from "./config/database.js"
 import cors from "cors"
 import cookieParser from "cookie-parser"
 import userRoute from "./route/userRoute.js"
+import resumeRouter from "./route/resumeRoute.js"
 
 dotenv.config()
 await connectDB()
@@ -23,6 +24,7 @@ app.get("/", (req,res)=>{
     res.send("Server API is Working")
 })
 app.get("/api/user", userRoute)
+app.get("api/resume", resumeRouter)
 
 app.listen(PORT, ()=>{
     console.log(`API is Working in port http://localhost:${PORT}`)
