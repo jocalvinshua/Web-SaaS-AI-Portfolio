@@ -4,11 +4,10 @@ import { Plus, Trash2, FolderCode } from 'lucide-react';
 const ProjectForm = ({ data = [], onChange }) => {
   
   const addProject = () => {
-    // DISESUAIKAN: Menggunakan 'name' (bukan title) agar sesuai dengan {project.name} di template
     const newProject = { 
-      name: '', 
-      type: '', 
-      description: '', 
+        name: '', 
+        type_project: '',
+        description: '', 
     };
     onChange([...data, newProject]);
   };
@@ -61,12 +60,12 @@ const ProjectForm = ({ data = [], onChange }) => {
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-500 uppercase">Project Type</label>
               <input 
-                type="text" 
-                name="type" // DISESUAIKAN: Key adalah 'type' sesuai template
-                value={proj.type || ""} 
-                onChange={(e) => handleChange(index, e)} 
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" 
-                placeholder="e.g. Web Development"
+                  type="text" 
+                  name="type_project" // Harus SAMA dengan properti di object newProject
+                  value={proj.type_project || ""} 
+                  onChange={(e) => handleChange(index, e)} 
+                  className="..." 
+                  placeholder="e.g. Web Development"
               />
             </div>
           </div>

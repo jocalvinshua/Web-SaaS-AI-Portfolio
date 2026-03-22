@@ -5,7 +5,7 @@ import { Mail, Lock, User, Loader2 } from "lucide-react";
 
 const Login = () => {
     const [state, setState] = useState("login");
-    const { isLoading, error, dispatch } = useAppContext();
+    const { isLoading, error, dispatch, login, register } = useAppContext();
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -21,27 +21,22 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        dispatch({ type: "LOGIN_START" });
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            const userData = {
-                name: formData.name || "User",
-                email: formData.email,
-            };
-            console.log(userData)
-            dispatch({
-                type: "LOGIN_SUCCESS",
-                payload: userData
-            });
-
-            navigate("/dashboard");
+            let success = false;
+            if (state === "login") {
+                success = await login({ 
+                    email: formData.email, 
+                    password: formData.password 
+                });
+            } else {
+                await register(formData);
+            }
+            if (success) {
+                navigate("/dashboard");
+            }
 
         } catch (err) {
-            dispatch({
-                type: "LOGIN_FAILURE",
-                payload: "Login failed. Please try again."
-            });
+            console.error("Auth Error:", err);
         }
     };
 

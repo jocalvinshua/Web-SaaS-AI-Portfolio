@@ -1,37 +1,40 @@
-import React, { useState } from 'react';
-import { Edit3, Trash2, FileText, Check, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Edit3, Trash2, FileText, Check, X, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // Tambahkan ini
+import { useAppContext } from '../AppContext/AppContext';
 
 function CurrentResume() {
-  // Data dummy
-  const [resumes, setResumes] = useState([
-    { id: 1, title: 'Frontend Developer 2026' },
-    { id: 2, title: 'Project Manager - Tech' },
-    { id: 3, title: 'Fullstack Web Resume' },
-  ]);
-
+  const { fetchUserResumes, userResumes, deleteResume, editTitleResume } = useAppContext();
   const [editingId, setEditingId] = useState(null);
   const [tempTitle, setTempTitle] = useState('');
+  const navigate = useNavigate();
 
-  // Handler Hapus
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this resume?')) {
-      setResumes(resumes.filter(r => r.id !== id));
-    }
+  const handleDelete = async (e, id) => {
+    e.stopPropagation(); // Mencegah kartu terbuka saat klik hapus
+    await deleteResume(id);
   };
 
-  // Handler Mulai Edit
-  const startEdit = (resume) => {
-    setEditingId(resume.id);
+  const startEdit = (e, resume) => {
+    e.stopPropagation(); // Mencegah kartu terbuka saat klik icon edit
+    setEditingId(resume._id);
     setTempTitle(resume.title);
   };
 
-  // Handler Simpan Judul Baru
-  const saveTitle = (id) => {
-    setResumes(resumes.map(r => 
-      r.id === id ? { ...r, title: tempTitle } : r
-    ));
-    setEditingId(null);
+  const saveTitle = async (e, id) => {
+    e.stopPropagation();
+    const success = await editTitleResume(id, tempTitle);
+    if (success) {
+      setEditingId(null);
+    }
   };
+
+  const handleOpenResume = (id) => {
+    navigate(`/dashboard/resume/${id}`);
+  };
+
+  useEffect(() => {
+    fetchUserResumes();
+  }, []);
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen font-['Outfit']">
@@ -44,10 +47,11 @@ function CurrentResume() {
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {resumes.map((resume) => (
+          {userResumes.map((resume) => (
             <div 
-              key={resume.id}
-              className="group relative bg-white border border-gray-200 rounded-2xl h-64 flex flex-col items-center justify-center transition-all hover:shadow-xl hover:-translate-y-1 overflow-hidden"
+              key={resume._id}
+              onClick={() => handleOpenResume(resume._id)}
+              className="group relative bg-white border border-gray-200 rounded-2xl h-64 flex flex-col items-center justify-center transition-all hover:shadow-xl hover:-translate-y-1 overflow-hidden cursor-pointer"
             >
               {/* Icon Placeholder */}
               <div className="bg-blue-50 p-4 rounded-full mb-4 text-blue-500 group-hover:scale-110 transition-transform duration-300">
@@ -55,42 +59,51 @@ function CurrentResume() {
               </div>
 
               {/* Title / Edit Mode */}
-              {editingId === resume.id ? (
-                <div className="px-4 w-full flex flex-col items-center gap-2 animate-in fade-in zoom-in duration-200">
+              {editingId === resume._id ? (
+                <div 
+                  className="px-4 w-full flex flex-col items-center gap-2 z-30"
+                  onClick={(e) => e.stopPropagation()} // Supaya klik input tidak trigger handleOpenResume
+                >
                   <input 
                     type="text"
                     value={tempTitle}
                     onChange={(e) => setTempTitle(e.target.value)}
-                    className="w-full px-3 py-1.5 border-2 border-blue-500 rounded-lg outline-none text-sm text-center"
+                    className="w-full px-3 py-1.5 border-2 border-blue-500 rounded-lg outline-none text-sm text-center font-medium"
                     autoFocus
                   />
                   <div className="flex gap-2">
-                    <button onClick={() => saveTitle(resume.id)} className="p-1.5 bg-green-500 text-white rounded-md hover:bg-green-600">
+                    <button 
+                      onClick={(e) => saveTitle(e, resume._id)} 
+                      className="p-1.5 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+                    >
                       <Check size={14} />
                     </button>
-                    <button onClick={() => setEditingId(null)} className="p-1.5 bg-gray-400 text-white rounded-md hover:bg-gray-500">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setEditingId(null); }} 
+                      className="p-1.5 bg-gray-400 text-white rounded-md hover:bg-gray-500 transition-colors"
+                    >
                       <X size={14} />
                     </button>
                   </div>
                 </div>
               ) : (
-                <h3 className="font-bold text-gray-800 px-4 text-center line-clamp-2">
+                <h3 className="font-bold text-gray-800 px-6 text-center line-clamp-2">
                   {resume.title}
                 </h3>
               )}
 
-              {/* Hover Overlay */}
-              {editingId !== resume.id && (
+              {/* Hover Overlay - Hanya muncul jika tidak sedang edit judul */}
+              {editingId !== resume._id && (
                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-[2px]">
                   <button 
-                    onClick={() => startEdit(resume)}
+                    onClick={(e) => startEdit(e, resume)}
                     className="p-3 bg-white/20 hover:bg-white/40 text-white rounded-xl backdrop-blur-md transition-all hover:scale-110"
                     title="Edit Title"
                   >
                     <Edit3 size={20} />
                   </button>
                   <button 
-                    onClick={() => handleDelete(resume.id)}
+                    onClick={(e) => handleDelete(e, resume._id)}
                     className="p-3 bg-red-500/20 hover:bg-red-500 text-white rounded-xl backdrop-blur-md transition-all hover:scale-110 border border-red-500/50"
                     title="Delete Resume"
                   >
@@ -101,8 +114,8 @@ function CurrentResume() {
             </div>
           ))}
 
-          {/* Empty State Card */}
-          {resumes.length === 0 && (
+          {/* Empty State */}
+          {userResumes.length === 0 && (
             <div className="col-span-full py-20 border-2 border-dashed border-gray-200 rounded-3xl flex flex-col items-center justify-center text-gray-400">
               <FileText size={48} className="mb-4 opacity-20" />
               <p>No resumes found. Create your first one!</p>

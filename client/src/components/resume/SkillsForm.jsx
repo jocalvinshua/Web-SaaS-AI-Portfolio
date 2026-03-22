@@ -6,14 +6,17 @@ const SkillsForm = ({ data = [], onChange }) => {
 
   // Fungsi menambah skill baru
   const addSkill = (e) => {
-    e.preventDefault();
-    const trimmedSkill = skillInput.trim();
-    
-    // Validasi: Tidak kosong dan belum ada di list
-    if (trimmedSkill && !data.includes(trimmedSkill)) {
-      onChange([...data, trimmedSkill]);
-      setSkillInput('');
-    }
+      e.preventDefault();
+      const trimmedSkill = skillInput.trim();
+
+      // Cek duplikasi berdasarkan properti .name
+      const isDuplicate = data.some(s => s.name.toLowerCase() === trimmedSkill.toLowerCase());
+
+      if (trimmedSkill && !isDuplicate) {
+          // KIRIM SEBAGAI OBJEK
+          onChange([...data, { name: trimmedSkill }]);
+          setSkillInput('');
+      }
   };
 
   // Fungsi menghapus skill
@@ -67,7 +70,7 @@ const SkillsForm = ({ data = [], onChange }) => {
                 key={index}
                 className="flex items-center gap-2 bg-white border border-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm animate-in zoom-in duration-200"
               >
-                {skill}
+                {skill.name}
                 <button
                   onClick={() => removeSkill(index)}
                   className="text-gray-400 hover:text-red-500 transition-colors"

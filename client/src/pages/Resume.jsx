@@ -1,6 +1,8 @@
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react" // Ditambahkan: useRef
 import { Link, useParams } from "react-router-dom"
-import { Palette, LayoutTemplate } from "lucide-react"
+import { Palette, LayoutTemplate, Save, Download } from "lucide-react"
+import { useReactToPrint } from "react-to-print"
+import { toast } from "react-toastify"
 
 import PersonalForm from "../components/resume/PersonalForm"
 import SummaryForm from "../components/resume/SummaryForm"
@@ -13,9 +15,15 @@ import ClassicTemplate from "../assets/templates/ClassicTemplate"
 import MinimalImageTemplate from "../assets/templates/MinimalImageTemplate"
 import MinimalTemplate from "../assets/templates/MinimalTemplate"
 import ModernTemplate from "../assets/templates/ModernTemplate"
+import { useAppContext } from "../AppContext/AppContext"
 
 export default function Resume() {
-    const { userId } = useParams()
+    const { resumeId } = useParams()
+    const { saveResume, getResumeById, currentResume } = useAppContext()
+    
+    // Ref untuk menangkap elemen yang akan di-print ke PDF
+    const componentRef = useRef(null) 
+
     const [step, setStep] = useState(1)
     const totalSteps = 6
     
@@ -23,7 +31,6 @@ export default function Resume() {
     const [selectedTemplate, setSelectedTemplate] = useState("classic")
     const [removeBackground, setRemoveBackground] = useState(false)
 
-    // Struktur state disamakan dengan kebutuhan template
     const [resumeData, setResumeData] = useState({
         personal_info: {
             full_name: "", email: "", phone: "", location: "",
@@ -45,11 +52,61 @@ export default function Resume() {
         minimalImage: MinimalImageTemplate
     }
 
+    // Ambil data dari database saat pertama kali halaman dibuka
+    useEffect(() => {
+        if (resumeId) {
+            getResumeById(resumeId)
+        }
+    }, [resumeId]) // Hanya jalan jika resumeId di URL berubah
+
+    // Sinkronisasi data dari Context ke State Lokal Editor
+    useEffect(() => {
+        if (currentResume && currentResume._id === resumeId) {
+            setResumeData({
+                personal_info: currentResume.personal_info || {},
+                professional_summary: currentResume.professional_summary || "",
+                education: currentResume.education || [],
+                experience: currentResume.experience || [],
+                project: currentResume.project || [],
+                skills: currentResume.skills || []
+            });
+            if (currentResume.themeColor) setThemeColor(currentResume.themeColor);
+            if (currentResume.template) setSelectedTemplate(currentResume.template);
+        }
+    }, [currentResume, resumeId])
+
     const updateSection = (section, value) => {
         setResumeData(prev => ({ ...prev, [section]: value }))
     }
 
     const ActiveTemplate = templates[selectedTemplate] || ClassicTemplate
+
+    const handleSave = async () => {
+        const formData = new FormData();
+        
+        // Jika user memilih file baru (bukan string URL)
+        if (resumeData.personal_info.image instanceof File) {
+            formData.append("profile_image", resumeData.personal_info.image);
+        }
+
+        // Masukkan data lainnya
+        formData.append("personal_info", JSON.stringify(resumeData.personal_info));
+        formData.append("professional_summary", resumeData.professional_summary);
+        formData.append("education", JSON.stringify(resumeData.education));
+        formData.append("experience", JSON.stringify(resumeData.experience));
+        formData.append("project", JSON.stringify(resumeData.project));
+        formData.append("skills", JSON.stringify(resumeData.skills));
+        formData.append("template", selectedTemplate);
+        formData.append("themeColor", themeColor);
+
+        await saveResume(resumeId, formData);
+    };
+
+    // Logic Download PDF
+    const handlePrint = useReactToPrint({
+        contentRef: componentRef,
+        documentTitle: resumeData.personal_info?.full_name || "My_Resume",
+    });
 
     return (
         <div className="min-h-screen bg-gray-50 font-['Outfit']">
@@ -59,7 +116,6 @@ export default function Resume() {
                 </Link>
 
                 <div className="flex items-center gap-6">
-                    {/* Color Picker */}
                     <div className="hidden md:flex items-center gap-2 border-r pr-6 border-gray-100">
                         <Palette size={18} className="text-gray-400" />
                         <div className="flex gap-1.5">
@@ -74,7 +130,6 @@ export default function Resume() {
                         </div>
                     </div>
 
-                    {/* Template Selector */}
                     <div className="flex items-center gap-2">
                         <LayoutTemplate size={18} className="text-gray-400" />
                         <select 
@@ -90,9 +145,18 @@ export default function Resume() {
                     </div>
                 </div>
 
-                <button className="btn-primary text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 transition-all">
-                    Download
-                </button>
+                <div className="flex items-center gap-4">
+                    <button 
+                        onClick={handleSave}
+                        className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-5 py-2 rounded-xl text-sm font-bold hover:bg-gray-50 transition-all shadow-sm"
+                    >
+                        <Save size={16} /> Save Progress
+                    </button>
+
+                    <button onClick={handlePrint} className="flex items-center gap-2 bg-primary text-white px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all">
+                        <Download size={16} /> Download PDF
+                    </button>
+                </div>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 h-[calc(100vh-65px)] overflow-hidden">
@@ -128,7 +192,7 @@ export default function Resume() {
                         </button>
                         <button 
                             onClick={() => setStep(prev => Math.min(totalSteps, prev + 1))} 
-                            className="btn-primary text-white px-10 py-2.5 rounded-xl font-bold hover:shadow-xl transition-all active:scale-95"
+                            className="bg-primary text-white px-10 py-2.5 rounded-xl font-bold hover:shadow-xl transition-all active:scale-95"
                         >
                             {step === totalSteps ? "Finish" : "Next Step"}
                         </button>
@@ -137,8 +201,11 @@ export default function Resume() {
 
                 {/* PREVIEW SIDE */}
                 <div className="bg-slate-100 p-12 overflow-y-auto flex justify-center custom-scrollbar shadow-inner">
-                    {/* Kertas A4 Wrapper */}
-                    <div className="bg-white shadow-2xl w-[210mm] min-h-[297mm] h-fit mb-10 origin-top transform scale-[0.85] xl:scale-100 transition-transform">
+                    {/* Pembungkus yang ditangkap oleh react-to-print */}
+                    <div 
+                        ref={componentRef} 
+                        className="bg-white shadow-2xl w-[210mm] min-h-[297mm] h-fit mb-10 origin-top transform scale-[0.85] xl:scale-100 transition-transform print:scale-100 print:shadow-none print:m-0"
+                    >
                         <ActiveTemplate 
                             data={resumeData} 
                             accentColor={themeColor} 

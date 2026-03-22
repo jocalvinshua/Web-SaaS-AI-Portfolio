@@ -3,13 +3,17 @@ import { useAppContext } from "../AppContext/AppContext";
 import { useEffect } from "react";
 
 export default function Layout() {
-    const { user, dispatch, isLogin } = useAppContext();
+    const { user, dispatch, isLogin, logout } = useAppContext();
     const navigate = useNavigate();
 
-    const logout = () => {
-        navigate("/", { replace: true });
-        dispatch({ type: "LOGOUT" });
-    }
+    const handleLogout = async () => {
+        try {
+            await logout();
+            navigate("/", { replace: true });
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+    };
 
     // render only user already login
     useEffect(()=>{
@@ -26,13 +30,12 @@ export default function Layout() {
                     <span className="text-xl font-bold text-primary">PortfoliUI</span>
                 </Link>
                 <div className="flex items-center gap-5">
-                    {/* PERBAIKAN: Gunakan user?.name, bukan {user} */}
                     <p className="text-gray-600 text-sm hidden sm:block">
                         Hi, <span className="font-semibold text-main">{user?.name || 'User'}</span>!
                     </p>
                     
                     <button 
-                        onClick={logout} 
+                        onClick={handleLogout} 
                         className='border border-gray-300 rounded-full text-sm px-5 py-1.5 hover:bg-gray-50 active:scale-95 transition-all text-main font-medium'
                     >
                         Logout

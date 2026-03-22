@@ -4,11 +4,16 @@ import jwt from "jsonwebtoken";
 
 // Handle User Register
 export const Register = async (req, res) => {
+    console.log(req.body)
     try {
         const { name, email, password } = req.body;
         
         if (!name || !email || !password) {
-            return res.status(400).json({ success: false, message: "All fields are required!" });
+            console.log("Data tidak lengkap:", req.body); 
+            return res.status(400).json({ 
+                success: false, 
+                message: "Silahkan isi semua kolom (Name, Email, Password)!" 
+            });
         }
 
         const existingUser = await User.findOne({ email });

@@ -32,23 +32,58 @@ export const createResume = async (req, res) => {
 export const saveResume = async (req, res) => {
     try {
         const { resumeId } = req.params;
-        const updateData = req.body; // Mengambil seluruh object resume dari frontend
         const userId = req.userId;
+        let updateData = { ...req.body };
 
-        // Cari dan Update hanya jika resume tersebut milik user yang login
-        const updatedResume = await Resume.findOneAndUpdate(
-            { _id: resumeId, user: userId },
-            { $set: updateData },
-            { new: true, runValidators: true }
-        );
+        const fieldsToParse = ['personal_info', 'education', 'experience', 'project', 'skills'];
 
-        if (!updatedResume) {
-            return res.status(404).json({ success: false, message: "Resume not found or unauthorized" });
+        fieldsToParse.forEach(field => {
+            if (updateData[field] && typeof updateData[field] === 'string') {
+                try {
+                    updateData[field] = JSON.parse(updateData[field]);
+                } catch (e) {
+                    updateData[field] = field === 'personal_info' ? {} : [];
+                }
+            }
+        });
+
+        // FIX: Mapping Eksplisit & Pembersihan data Project
+        if (updateData.project && Array.isArray(updateData.project)) {
+            updateData.project = updateData.project.map(proj => ({
+                name: proj.name || "",
+                description: proj.description || "",
+                // Ini kunci perbaikannya: memaksa field 'type_project' diisi
+                type_project: proj.type_project || proj.type || "" 
+            }));
         }
 
-        return res.status(200).json({ success: true, resume: updatedResume });
+        if (req.file) {
+            if (!updateData.personal_info) updateData.personal_info = {};
+            updateData.personal_info.image = req.file.path;
+        }
+
+        // Gunakan updateData yang SUDAH DI-MAP di atas
+        const updatedResume = await Resume.findOneAndUpdate(
+            { _id: resumeId, user: userId },
+            { 
+                $set: {
+                    ...updateData,
+                    project: updateData.project // Timpa ulang secara eksplisit
+                } 
+            },
+            { 
+                returnDocument: 'after', 
+                runValidators: true 
+            }
+        );
+
+        if (!updatedResume) return res.status(404).json({ success: false, message: "Resume tidak ditemukan" });
+
+        res.status(200).json({ success: true, resume: updatedResume });
+
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+        console.error("DETEKSI ERROR:", error.message);
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
@@ -92,25 +127,43 @@ export const deleteResume = async (req, res) => {
     }
 };
 
-export const getUserResume = async(req,res)=>{
+export const getUserResume = async(req, res) => {
     try {
-        const {userId} = req.userId;
+        const userId = req.userId; 
 
         if (!userId) {
-            return res.status(401).json({ success: false, message: "Unauthorized Access. Login Again" });
+            return res.status(401).json({ success: false, message: "Unauthorized Access" });
         }
 
         const userResumes = await Resume.find({ user: userId }).sort({ updatedAt: -1 });
+        
         return res.status(200).json({ 
             success: true, 
             count: userResumes.length,
-            userResumes 
+            userResumes
         }); 
     } catch (error) {
         console.error("Error in userResume:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+}
+
+export const getResumeById = async (req, res) => {
+    try {
+        const { resumeId } = req.params;
+        const resume = await Resume.findById(resumeId);
+
+        if (resume) {
+            return res.status(200).json({ success: true, resume });
+        } else {
+            return res.status(404).json({ success: false, message: "Resume Not Found" });
+        }
+    } catch (error) {
+        console.error("Error in getResumeById:", error.message);
+        
         return res.status(500).json({ 
             success: false, 
-            message: "Failed to fetch User Resume." 
+            message: "Failed to fetch Resume. Format ID mungkin salah." 
         });
     }
 }

@@ -94,7 +94,7 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                                 <div className="flex flex-wrap gap-2">
                                     {data.skills.map((skill, index) => (
                                         <span key={index} className="px-3 py-1 bg-white border border-zinc-200 text-zinc-600 text-[11px] font-medium rounded-full shadow-sm">
-                                            {skill}
+                                            {skill.name}
                                         </span>
                                     ))}
                                 </div>
@@ -175,7 +175,7 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                                     {data.project.map((project, index) => (
                                         <div key={index} className="p-4 bg-zinc-50 rounded-lg border border-zinc-100">
                                             <h3 className="font-bold text-zinc-800 text-sm mb-1">{project.name}</h3>
-                                            <p className="text-[11px] font-medium mb-2 uppercase tracking-wider" style={{ color: accentColor }}>{project.type}</p>
+                                            <p className="text-[11px] font-medium mb-2 uppercase tracking-wider" style={{ color: accentColor }}>{project.type_project}</p>
                                             <p className="text-[13px] text-zinc-600 leading-snug">{project.description}</p>
                                         </div>
                                     ))}

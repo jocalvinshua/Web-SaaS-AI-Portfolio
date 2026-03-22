@@ -11,9 +11,9 @@ const resumeSchema = new mongoose.Schema({
         required: true,
         default: "Untitled Resume",
     },
-    personalInfo: {
+    personal_info: {
         full_name: String,
-        profile_img: String,
+        image: String,
         email: String,
         phone: String,
         location: String,
@@ -21,7 +21,7 @@ const resumeSchema = new mongoose.Schema({
         linkedin: String,
         website: String,
     },
-    summary: {
+    professional_summary: {
         type: String
     },
     experience: [
@@ -55,9 +55,13 @@ const resumeSchema = new mongoose.Schema({
             name: String,
         },
     ],
-    templateId: {
+    template: {
         type: String,
-        default: "classic",
+        default: "classic"
+    },
+    themeColor:{
+        type:String,
+        default: "#2563eb"
     },
     updatedAt: {
         type: Date,

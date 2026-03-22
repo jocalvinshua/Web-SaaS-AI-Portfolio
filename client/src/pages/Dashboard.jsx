@@ -2,27 +2,35 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import OurResume from "../components/OurResume"
+import { useAppContext } from "../AppContext/AppContext"
 
 export default function Dashboard() {
     const [isOpen, setIsOpen] = useState(false)
     const [title, setTitle] = useState("")
     const navigate = useNavigate()
 
-    // Dummy random id
-    const id = Math.random()
+    const { createResume } = useAppContext()
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
+    
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         
-        if (title.trim()) {
-            // alert(`Resume Title Created: ${title}`)
-            navigate(`/dashboard/resume/${id}`);
-            setIsOpen(false)
-            setTitle("")
-        } else {
-            alert("Please enter a title")
+        if (!title.trim()) {
+            alert("Please enter a title");
+            return;
         }
-    }
+        try {
+            const newResume = await createResume(title);
+
+            if (newResume && newResume._id) {
+                navigate(`/dashboard/resume/${newResume._id}`);
+                setIsOpen(false);
+                setTitle("");
+            }
+        } catch (error) {
+            console.error("Gagal membuat resume:", error.message);
+        }
+    };
 
     return (
         <div className="p-8 font-['Outfit']">

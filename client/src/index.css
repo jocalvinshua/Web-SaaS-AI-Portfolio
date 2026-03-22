@@ -51,3 +51,21 @@
     background-color: var(--color-primary-light);
   }
 }
+
+@media print {
+  /* Menghilangkan Header/Footer default browser (tanggal, URL, dll) */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact; /* Memastikan warna background & border muncul */
+    print-color-adjust: exact;
+  }
+
+  /* Sembunyikan semua elemen kecuali yang ada di dalam Ref */
+  .no-print {
+    display: none !important;
+  }
+}
