@@ -74,7 +74,8 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                                 <div className="space-y-6">
                                     {data.education.map((edu, index) => (
                                         <div key={index} className="text-[13px]">
-                                            <p className="font-bold text-zinc-800 leading-tight mb-1 uppercase tracking-wide">{edu.degree}</p>
+                                            <p className="font-bold text-zinc-800 leading-tight uppercase tracking-wide">{edu.degree}</p>
+                                            <p className="text-zinc-700 font-medium text-[12px]">{edu.field}</p>
                                             <p className="text-zinc-500 italic mb-1">{edu.institution}</p>
                                             <p className="text-[11px] font-medium" style={{ color: accentColor }}>
                                                 {formatDate(edu.graduation_date)}

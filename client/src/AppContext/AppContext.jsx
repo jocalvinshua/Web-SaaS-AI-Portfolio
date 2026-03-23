@@ -1,6 +1,8 @@
 import { createContext, useState, useContext, useReducer, useEffect } from "react";
 import { userAxios, resumeAxios } from "../axios/Axios";
 import { toast } from "react-toastify";
+// import { GoogleGenerativeAI } from "@google/generative-ai"
+import { GoogleGenAI } from "@google/genai";
 
 const AppContext = createContext();
 
@@ -33,6 +35,10 @@ export const AppProvider = ({ children }) => {
   const [resume, setResume] = useState({});
   const [userResumes, setUserResumes] = useState([]);
   const [currentResume, setCurrentResume] = useState({})
+  // const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+  const ai = new GoogleGenAI({
+    apiKey: import.meta.env.VITE_GEMINI_API_KEY,
+  });
 
   // --- LOGIKA USER ---
 
@@ -190,6 +196,33 @@ export const AppProvider = ({ children }) => {
     }
   }
 
+  const enhanceSummary = async (currentSummary, profession) => {
+    try {
+      // Menggunakan model Gemini 3 Flash Preview (Standar 2026)
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `
+          You are an expert resume writer. 
+          Task: Enhance the professional summary below to be more impactful, ATS-friendly, and professional.
+          User's Profession: ${profession || "Professional"}
+          Current Summary: "${currentSummary}"
+
+          Requirements:
+          - Use strong action verbs.
+          - Keep it concise (max 3-4 sentences).
+          - Focus on achievements and value proposition.
+          - Output ONLY the enhanced text, no introductory words or quotes.
+        `,
+      });
+
+      return response.text; 
+    } catch (error) {
+      console.error("AI Enhance Error:", error);
+      throw new Error("AI service is currently unavailable. Please try again later.");
+    }
+  };
+
+
   useEffect(() => {
     getUserData();
   }, []);
@@ -208,7 +241,8 @@ export const AppProvider = ({ children }) => {
     editTitleResume,
     deleteResume,
     getResumeById,
-    currentResume
+    currentResume,
+    enhanceSummary
   };
 
   return (
