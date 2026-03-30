@@ -50,6 +50,12 @@ export const AppProvider = ({ children }) => {
         fetchUserResumes();
       }
     } catch (error) {
+      if(error.response?.status !== 401){
+        toast.error("Failed to authenticate user");
+      }
+      else{
+        console.log("User not authenticated");
+      }
       dispatch({ type: "STOP_LOADING" });
     }
   };
@@ -61,7 +67,7 @@ export const AppProvider = ({ children }) => {
       if (data.success) {
         dispatch({ type: "LOGIN_SUCCESS", payload: data.user });
         toast.success("Login Successful!");
-        console.log(data)
+        // console.log(data)
         return true;
       }
     } catch (error) {
@@ -78,7 +84,7 @@ export const AppProvider = ({ children }) => {
       if (data.success) {
         dispatch({ type: "LOGIN_SUCCESS", payload: data.user });
         toast.success("Registration Success!");
-        console.log(data)
+        // console.log(data)
         return true;
       }
     } catch (error) {

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 
 import OurResume from "../components/OurResume"
 import { useAppContext } from "../AppContext/AppContext"
+import { toast } from "react-toastify"
 
 export default function Dashboard() {
     const [isOpen, setIsOpen] = useState(false)
@@ -11,7 +12,9 @@ export default function Dashboard() {
 
     const { createResume } = useAppContext()
 
-    
+    const handleUploadResume = ()=>{
+        toast.info("This feature is not available yet! Please check back later :)")
+    }    
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -52,7 +55,9 @@ export default function Dashboard() {
                     <span className="font-semibold text-gray-600 group-hover:text-primary">Create New Resume</span>
                 </div>
 
-                <div className="bg-white border border-gray-200 rounded-2xl p-10 flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition-all">
+                <div 
+                onClick={handleUploadResume}
+                className="bg-white border border-gray-200 rounded-2xl p-10 flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition-all">
                     <span className="font-semibold text-gray-600">Upload Resume</span>
                 </div>
             </div>
