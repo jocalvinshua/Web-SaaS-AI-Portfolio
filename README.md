@@ -31,7 +31,7 @@ Personalize your resume with custom theme colors to match your personal branding
 # 🚀 Getting Started
 1. Clone the Repository
 ```
-git clone https://github.com/username/resume-builder-ai.git
+git clone https://github.com/jocalvinshua/resume-builder-ai.git
 cd resume-builder-ai
 ```
 2. Install Dependencies
